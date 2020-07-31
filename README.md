@@ -7,7 +7,7 @@ When executed it prints out the reverse shell (so you can pipe it to `xclip` and
 ## Installation
 
 ```
-chmod +x reversegen
+chmod +x reversegen.py
 sudo ln -s $(pwd)/reversegen.py /usr/local/bin/reversegen
 ```
 
