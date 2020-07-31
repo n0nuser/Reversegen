@@ -10,7 +10,7 @@ def GREEN(text):
     return "\033[32m{}\033[0m".format(str(text))
 
 def usage():
-    print("python reversegen.py <Method> <IP> <Port>\n")
+    print("python reversegen.py <Method> <IP> <Port> [-f fileName]\n")
     print("Methods available:")
     print(" - " + GREEN("bash"))
     print(" - " + GREEN("bash2"))
@@ -28,13 +28,14 @@ def usage():
     print(" - " + GREEN("ruby3"))
     print(" - " + GREEN("telnet"))
     print("Each method explained in detail in the README.")
-    
     sys.exit()
 
 # Validations
 
-if (len(sys.argv) != 4): usage()
-elif (str(sys.argv[1]) not in methods): usage()
+if (len(sys.argv) != 4 and len(sys.argv) != 6): 
+    usage()
+elif (str(sys.argv[1]) not in methods): 
+    usage()
 elif (not (1 <= int(sys.argv[3]) <= 65535)):
     print("That port can't be used!")
     sys.exit()
@@ -46,14 +47,21 @@ method = str(sys.argv[1])
 if (re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",str(sys.argv[2]))):
     ip = str(sys.argv[2])
 else:
-    ip = socket.gethostbyname(str(sys.argv[2]))
+    try:
+        ip = socket.gethostbyname(str(sys.argv[2]))
+    except:
+        print("Invalid Host!")
+        sys.exit()
 
 port = str(sys.argv[3])
 
-# Opens file
-
-filename = method + "_reverse_" + ip + "_" + port + ".txt"
-file = open(filename,'w')
+save = False
+if (len(sys.argv) == 6):
+    if (str(sys.argv[4]) == "-f"):
+        save = True
+        filename = str(sys.argv[5])
+    else:
+        usage()
 
 # Selects method
 
@@ -104,6 +112,9 @@ elif(method == 'telnet'):
 
 # Writes to file and prints out
 
-file.write(data)
-file.close()
+if (save):
+    file = open(filename,'w')
+    file.write(data + "\n")
+    file.close()
+
 print(data)
