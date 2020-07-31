@@ -14,13 +14,15 @@ sudo ln -s $(pwd)/reversegen.py /usr/local/bin/reversegen
 ## Usage:
 
 ```
-reversegen <Method> <IP> <Port>
+reversegen <Method> <IP> <Port> [-f fileName]
 ```
 
 Example of usage: 
 
 ```
 reversegen python 192.168.1.10 4444
+reversegen python 10.10.1.14 4444 -f revpy_10.10.1.14_4444.txt
+reversegen python 10.10.1.14 4444 -f ~/rev
 reversegen python c2.com 4444
 ```
 
@@ -28,6 +30,8 @@ Example of copying the result:
 
 ```
 reversegen bash 10.10.1.14 1234 | xclip -selection clipboard
+reversegen python 10.10.1.14 4444 -f revpy_10.10.1.14_4444.txt | xclip -selection clipboard
+reversegen python 10.10.1.14 4444 -f ~/rev | xclip -selection clipboard
 reversegen bash c2.com 1234 | xclip -selection clipboard
 ```
 
